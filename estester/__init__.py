@@ -143,11 +143,12 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
         url = "{0}{1}/".format(self.host, self.index)
         requests.delete(url, proxies=self.proxies)
 
-    def search(self, query):
+    def search(self, query=None):
         """
         Run a search <query> (JSON) and returns the JSON response.
         """
         url = "{0}{1}/_search".format(self.host, self.index)
+        query = {} if query is None else query
         response = requests.post(
             url,
             data=json.dumps(query),

@@ -61,7 +61,14 @@ class SimpleQueryTestCase(ElasticSearchQueryTestCase):
     ]
     timeout = 1
 
-    def test_query_by_nina_returns_one_result(self):
+    def test_search_by_nothing_returns_two_results(self):
+        response = self.search()
+        expected = {u"name": u"Nina Fox"}
+        self.assertEqual(response["hits"]["total"], 2)
+        self.assertEqual(response["hits"]["hits"][0]["_id"], u"1")
+        self.assertEqual(response["hits"]["hits"][1]["_id"], u"2")
+
+    def test_search_by_nina_returns_one_result(self):
         response = self.search(SIMPLE_QUERY)
         expected = {u"name": u"Nina Fox"}
         self.assertEqual(response["hits"]["total"], 1)
