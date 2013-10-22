@@ -154,3 +154,16 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
             data=json.dumps(query),
             proxies=self.proxies)
         return json.loads(response.text)
+
+    def tokenize(self, text, analyzer):
+        """
+        Run <analyzer> on text and returns a dict containing the tokens.
+        """
+        url = "{0}{1}/_analyze".format(self.host, self.index)
+        if analyzer != "default":
+            url += "?analyzer={2}".format(analyzer)
+        response = requests.post(
+            url,
+            data=json.dumps(text),
+            proxies=self.proxies)
+        return json.loads(response.text)

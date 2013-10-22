@@ -74,3 +74,10 @@ class SimpleQueryTestCase(ElasticSearchQueryTestCase):
         self.assertEqual(response["hits"]["total"], 1)
         self.assertEqual(response["hits"]["hits"][0]["_id"], u"1")
         self.assertEqual(response["hits"]["hits"][0]["_source"], expected)
+
+    def test_tokenize_nothing_to_declare(self):
+        response = self.tokenize("Nothing to declare", "default")
+        items_list = response["tokens"]
+        self.assertEqual(len(items_list), 2)
+        tokens = [item["token"] for item in items_list]
+        self.assertEqual(sorted(tokens), ["declare", "nothing"])
