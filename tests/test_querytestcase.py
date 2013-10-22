@@ -42,6 +42,7 @@ class DefaultValuesTestCase(unittest.TestCase):
         self.assertEqual(ESQTC.host, "http://0.0.0.0:9200/")
         self.assertEqual(ESQTC.fixtures, [])
         self.assertEqual(ESQTC.timeout, 5)
+        self.assertEqual(ESQTC.proxies, {})
 
 
 class SimpleQueryTestCase(ElasticSearchQueryTestCase):

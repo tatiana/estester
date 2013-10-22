@@ -64,6 +64,7 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
     index = "sample.test"  # must be lower case
     reset_index = True  # warning: if this is True, index will be cleared up
     host = "http://0.0.0.0:9200/"
+    proxies = {}
     fixtures = []
     timeout = 5
 
@@ -125,7 +126,10 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
             doc_body = doc["body"]
             url = "{0}{1}/{2}/{3}"
             url = url.format(self.host, self.index, doc_type, doc_id)
-            response = requests.put(url, data=json.dumps(doc_body))
+            response = requests.put(
+                url,
+                data=json.dumps(doc_body),
+                proxies=self.proxies)
             if not response.status_code in [200, 201]:
                 raise ElasticSearchException(response.text)
         time.sleep(self.timeout)
@@ -137,12 +141,15 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
             index: name of the index to be deleted
         """
         url = "{0}{1}/".format(self.host, self.index)
-        requests.delete(url)
+        requests.delete(url, proxies=self.proxies)
 
     def search(self, query):
         """
         Run a search <query> (JSON) and returns the JSON response.
         """
         url = "{0}{1}/_search".format(self.host, self.index)
-        response = requests.post(url, data=json.dumps(query))
+        response = requests.post(
+            url,
+            data=json.dumps(query),
+            proxies=self.proxies)
         return json.loads(response.text)
