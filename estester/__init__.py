@@ -6,7 +6,7 @@ import urllib
 import requests
 
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __author__ = "Tatiana Al-Chueyr Pereira Martins"
 __license__ = "GNU GPL v2"
 
@@ -161,7 +161,7 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
         """
         url = "{0}{1}/_analyze".format(self.host, self.index)
         if analyzer != "default":
-            url += "?analyzer={2}".format(analyzer)
+            url += "?analyzer={0}".format(analyzer)
         response = requests.post(
             url,
             data=json.dumps(text),
