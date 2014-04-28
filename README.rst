@@ -64,7 +64,7 @@ Basic example, only re-defining fixtures: ::
         ]
 
         def test_query_by_nina_returns_one_result(self):
-            response = self.query(SAMPLE_QUERY)
+            response = self.search(SAMPLE_QUERY)
             self.assertEqual(response["hits"]["total"], 1)
             self.assertEqual(response["hits"]["hits"][0]["_id"], u"1")
             self.assertEqual(response["hits"]["hits"][0]["_source"], {u"name": u"Nina Fox"})
