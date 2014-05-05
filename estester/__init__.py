@@ -6,7 +6,6 @@ import urllib
 import requests
 
 
-__version__ = "1.1.0"
 __author__ = "Tatiana Al-Chueyr Pereira Martins"
 __license__ = "GNU GPL v2"
 
@@ -64,6 +63,7 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
     index = "sample.test"  # must be lower case
     reset_index = True  # warning: if this is True, index will be cleared up
     host = "http://0.0.0.0:9200/"
+    mapping = {}
     proxies = {}
     fixtures = []
     timeout = 5
@@ -78,6 +78,10 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
         """
         if self.reset_index:
             self.delete_index()
+
+        self.create_index()
+        if self.mapping:
+            self.load_mapping()
         self.load_fixtures()
 
     def _post_teardown(self):
@@ -92,9 +96,38 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
         if self.reset_index:
             self.delete_index()
 
+    def create_index(self):
+        """
+        Use the following class attributes:
+            index: name of the index (default: sample.test)
+            host: ElasticSearch host (default: http://localhost:9200/)
+
+        To create empty index in ElasticSearch.
+        """
+        url = "{0}{1}/"
+        url = url.format(self.host, self.index)
+        response = requests.put(url, proxies=self.proxies)
+
+    def load_mapping(self):
+        """
+        Use the following class attributes:
+            index: name of the index (default: sample.test)
+            host: ElasticSearch host (default: http://localhost:9200/)
+            mapping: dictionary containing type mappings (default: {})
+
+        And load mappings to existent index.
+        """
+        for doc_type, type_mapping in self.mapping.items():
+            url = "{0}{1}/{2}/_mapping"
+            url = url.format(self.host, self.index, doc_type)
+            response = requests.put(
+                url,
+                data=json.dumps({doc_type: type_mapping}),
+                proxies=self.proxies)
+
     def load_fixtures(self):
         """
-        Uses the following class attributes:
+        Use the following class attributes:
             index: name of the index (default: sample.test)
             host: ElasticSearch host (default: http://localhost:9200/)
             fixtures: list of items to be loaded (default: [])
