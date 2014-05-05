@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-from estester import __version__
 
 
 README = open('README.rst').read()
@@ -23,5 +22,5 @@ setup(name="ESTester",
       packages=find_packages(),
       tests_require=["coverage==3.6", "nose==1.2.1", "pep8==1.4.1", "mock==1.0.1", "pylint==1.0.0"],
       url = "http://github.com/tatiana/estester",
-      version=__version__
+      version="1.2.0"
 )
