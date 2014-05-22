@@ -63,10 +63,11 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
     index = "sample.test"  # must be lower case
     reset_index = True  # warning: if this is True, index will be cleared up
     host = "http://0.0.0.0:9200/"
-    mapping = {}
+    mappings = {}
     proxies = {}
     fixtures = []
     timeout = 5
+    settings = {}
 
     def _pre_setup(self):
         """
@@ -80,8 +81,8 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
             self.delete_index()
 
         self.create_index()
-        if self.mapping:
-            self.load_mapping()
+        #if self.mapping:
+        #    self.load_mapping()
         self.load_fixtures()
 
     def _post_teardown(self):
@@ -101,29 +102,38 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
         Use the following class attributes:
             index: name of the index (default: sample.test)
             host: ElasticSearch host (default: http://localhost:9200/)
+            settings: used to define analyzers (optional) (i)
+            mappings: attribute specific mappings according to types
 
-        To create empty index in ElasticSearch.
+        To create an empty index in ElasticSearch.
+
+        (i) http://www.elasticsearch.org/guide/en/elasticsearch/guide/current/configuring-analyzers.html
         """
         url = "{0}{1}/"
         url = url.format(self.host, self.index)
-        response = requests.put(url, proxies=self.proxies)
+        data = {}
+        if self.mapping:
+            data["mappings"] = self.mapping
+        if self.settings:
+            data["settings"] = self.settings
+        response = requests.put(url, proxies=self.proxies, data=data)
 
-    def load_mapping(self):
-        """
-        Use the following class attributes:
-            index: name of the index (default: sample.test)
-            host: ElasticSearch host (default: http://localhost:9200/)
-            mapping: dictionary containing type mappings (default: {})
-
-        And load mappings to existent index.
-        """
-        for doc_type, type_mapping in self.mapping.items():
-            url = "{0}{1}/{2}/_mapping"
-            url = url.format(self.host, self.index, doc_type)
-            response = requests.put(
-                url,
-                data=json.dumps({doc_type: type_mapping}),
-                proxies=self.proxies)
+#    def load_mapping(self):
+#        """
+#        Use the following class attributes:
+#            index: name of the index (default: sample.test)
+#            host: ElasticSearch host (default: http://localhost:9200/)
+#            mapping: dictionary containing type mappings (default: {})
+#
+#        And load mappings to existent index.
+#        """
+#        for doc_type, type_mapping in self.mapping.items():
+#            url = "{0}{1}/{2}/_mapping"
+#            url = url.format(self.host, self.index, doc_type)
+#            response = requests.put(
+#                url,
+#                data=json.dumps({doc_type: type_mapping}),
+#                proxies=self.proxies)
 
     def load_fixtures(self):
         """
