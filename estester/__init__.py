@@ -112,8 +112,8 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
         url = "{0}{1}/"
         url = url.format(self.host, self.index)
         data = {}
-        if self.mapping:
-            data["mappings"] = self.mapping
+        if self.mappings:
+            data["mappings"] = self.mappings
         if self.settings:
             data["settings"] = self.settings
         response = requests.put(url, proxies=self.proxies, data=data)
