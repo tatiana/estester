@@ -158,7 +158,6 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
              url,
              data=json.dumps(self.settings),
              proxies=self.proxies)
-         import pdb; pdb.set_trace()
          url = "{0}{1}/_open".format(self.host, self.index)
          response = requests.post(url, proxies=self.proxies)
 
