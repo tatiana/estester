@@ -1,6 +1,7 @@
 import unittest
 from mock import patch
-from estester import ElasticSearchQueryTestCase, ExtendedTestCase
+from estester import ElasticSearchQueryTestCase, ExtendedTestCase,\
+    MultipleIndexesQueryTestCase
 
 
 SIMPLE_QUERY = {
@@ -43,6 +44,86 @@ class DefaultValuesTestCase(unittest.TestCase):
         self.assertEqual(ESQTC.fixtures, [])
         self.assertEqual(ESQTC.timeout, 5)
         self.assertEqual(ESQTC.proxies, {})
+
+
+class SimpleMultipleIndexesQueryTestCase(MultipleIndexesQueryTestCase):
+
+    data = {
+        "personal": {
+            "fixtures": [
+                {
+                    "type": "contact",
+                    "id": "1",
+                    "body": {"name": "Dmitriy"}
+                },
+                {
+                    "type": "contact",
+                    "id": "2",
+                    "body": {"name": "Agnessa"}
+                }
+            ]
+        },
+        "professional": {
+            "fixtures": [
+                {
+                    "type": "contact",
+                    "id": "1",
+                    "body": {"name": "Nikolay"}
+                }
+            ]
+        }
+    }
+
+    def test_search_all_indexes(self):
+        response = self.search()
+        expected = [
+            {
+                u'_score': 1.0,
+                u'_type': u'contact',
+                u'_id': u'1',
+                u'_source': {u'name': u'Dmitriy'},
+                u'_index': u'personal'
+            },
+            {
+                u'_score': 1.0,
+                u'_type': u'contact',
+                u'_id': u'2',
+                u'_source': {u'name': u'Agnessa'},
+                u'_index': u'personal'
+            },
+            {
+                u'_score': 1.0,
+                u'_type': u'contact',
+                u'_id': u'1', u'_source': {u'name': u'Nikolay'},
+                u'_index': u'professional'
+            }
+        ]
+        self.assertEqual(response["hits"]["total"], 3)
+        self.assertEqual(sorted(response["hits"]["hits"]), sorted(expected))
+
+    def test_search_one_index_that_has_item(self):
+        query = {
+            "query": {
+                "text": {
+                    "name": "Agnessa"
+                }
+            }
+        }
+        response = self.search_in_index("personal", query)
+        self.assertEqual(response["hits"]["total"], 1)
+        expected = {u'name': u'Agnessa'}
+        self.assertEqual(response["hits"]["hits"][0]["_source"], expected)
+
+    def test_search_one_index_that_doesnt_have_item(self):
+        query = {
+            "query": {
+                "text": {
+                    "name": "Agnessa"
+                }
+            }
+        }
+        response = self.search_in_index("professional", query)
+        self.assertEqual(response["hits"]["total"], 0)
 
 
 class SimpleQueryTestCase(ElasticSearchQueryTestCase):
