@@ -112,7 +112,8 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
 
         To create an empty index in ElasticSearch.
 
-        (i) http://www.elasticsearch.org/guide/en/elasticsearch/guide/current/configuring-analyzers.html
+        (i) http://www.elasticsearch.org/guide/en/elasticsearch/guide/current/
+        configuring-analyzers.html
         """
         url = "{0}{1}/"
         url = url.format(self.host, self.index)
@@ -121,45 +122,46 @@ class ElasticSearchQueryTestCase(ExtendedTestCase):
             data["mappings"] = self.mappings
         if self.settings:
             data["settings"] = self.settings
-        response = requests.put(url, proxies=self.proxies, data=json.dumps(data))
+        json_data = json.dumps(data)
+        response = requests.put(url, proxies=self.proxies, data=json_data)
 
     def load_mappings(self):
-         """
-         Use the following class attributes:
-             index: name of the index (default: sample.test)
-             host: ElasticSearch host (default: http://localhost:9200/)
-             mapping: dictionary containing type mappings (default: {})
- 
-         And load mappings to existent index.
-         """
-         for doc_type, type_mapping in self.mappings.items():
-             url = "{0}{1}/{2}/_mapping"
-             url = url.format(self.host, self.index, doc_type)
-             response = requests.put(
-                 url,
-                 data=json.dumps({doc_type: type_mapping}),
-                 proxies=self.proxies)
+        """
+        Use the following class attributes:
+            index: name of the index (default: sample.test)
+            host: ElasticSearch host (default: http://localhost:9200/)
+            mapping: dictionary containing type mappings (default: {})
+
+        And load mappings to existent index.
+        """
+        for doc_type, type_mapping in self.mappings.items():
+            url = "{0}{1}/{2}/_mapping"
+            url = url.format(self.host, self.index, doc_type)
+            response = requests.put(
+                url,
+                data=json.dumps({doc_type: type_mapping}),
+                proxies=self.proxies)
 
     def load_settings(self):
-         """
-         Use the following class attributes:
-             index: name of the index (default: sample.test)
-             host: ElasticSearch host (default: http://localhost:9200/)
-             mapping: dictionary containing type mappings (default: {})
- 
-         And load mappings to existent index.
-         """
-         url = "{0}{1}/_close".format(self.host, self.index)
-         response = requests.post(url, proxies=self.proxies)
+        """
+        Use the following class attributes:
+            index: name of the index (default: sample.test)
+            host: ElasticSearch host (default: http://localhost:9200/)
+            mapping: dictionary containing type mappings (default: {})
 
-         url = "{0}{1}/_settings"
-         url = url.format(self.host, self.index)
-         response = requests.put(
-             url,
-             data=json.dumps(self.settings),
-             proxies=self.proxies)
-         url = "{0}{1}/_open".format(self.host, self.index)
-         response = requests.post(url, proxies=self.proxies)
+        And load mappings to existent index.
+        """
+        url = "{0}{1}/_close".format(self.host, self.index)
+        response = requests.post(url, proxies=self.proxies)
+
+        url = "{0}{1}/_settings"
+        url = url.format(self.host, self.index)
+        response = requests.put(
+            url,
+            data=json.dumps(self.settings),
+            proxies=self.proxies)
+        url = "{0}{1}/_open".format(self.host, self.index)
+        response = requests.post(url, proxies=self.proxies)
 
     def load_fixtures(self):
         """
